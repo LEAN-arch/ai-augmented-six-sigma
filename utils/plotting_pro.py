@@ -10,7 +10,16 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 from scipy.stats import norm, gaussian_kde
 import graphviz
-# Corrected import path
+import sys
+import os
+
+# --- Robust Pathing ---
+# This allows this module to be run or imported from various contexts
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+# ----------------------
+
 from utils.config import COLORS
 # --- Define Phase ---
 def plot_voc_nlp_summary():
