@@ -1,34 +1,51 @@
 import streamlit as st
 from utils.data_generator import generate_control_chart_data
-from utils.plotting import plot_control_chart_comparison
+from utils.plotting_pro import plot_control_chart_pro
 
 st.set_page_config(layout="wide", page_title="Control Phase")
-st.title("📡 Control Phase: Sustaining the Gains")
-st.markdown("The Control phase ensures the process stays in its improved state. Classical Statistical Process Control (SPC) is reactive, detecting shifts after they happen. ML enables a proactive, predictive approach.")
-
-st.header("SPC (Classical) vs. Anomaly Detection (ML)")
+st.title("📡 Control Phase: Sustaining and Monitoring Gains")
 st.markdown("""
-- **Classical Control Chart (X-bar):** Monitors a single variable over time. Triggers an alarm when a point falls outside the +/- 3 sigma control limits. It's simple, robust, and effective for stable processes.
-- **ML Anomaly Detection:** Learns the normal operating patterns of the system, including correlations between many variables. It can flag subtle deviations in the *pattern* of data that may be a precursor to a failure, even if no single variable has gone out of its classical limits.
+**Objective:** To implement a system to monitor the improved process, ensuring it remains stable and that the gains are sustained over time. This involves moving from detection to prediction.
 """)
+st.markdown("---")
 
-st.sidebar.header("Interactive Simulation")
+st.header("Process Monitoring: SPC vs. ML Anomaly Detection")
+
+st.sidebar.header("Control Simulator")
+st.sidebar.markdown("Introduce a shift in the process and see which method detects it first.")
 shift_point = st.sidebar.slider("Point of Process Shift", min_value=50, max_value=130, value=100, key="control_shift_point")
-shift_magnitude = st.sidebar.slider("Magnitude of Shift (in Std Devs)", 0.5, 4.0, 1.5, 0.1, key="control_shift_mag")
+shift_magnitude = st.sidebar.slider("Magnitude of Shift (in Std Devs)", 0.5, 4.0, 1.8, 0.1, key="control_shift_mag")
 
-# Generate data and plot
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("Classical: Statistical Process Control (SPC)")
+    st.info("SPC uses control charts to monitor a single process variable. It's based on detecting points or patterns that are statistically unlikely.")
+    with st.expander("Show Key SPC Rules (Western Electric)"):
+        st.markdown("""
+        - **Rule 1:** One point outside the ±3σ limits. (Detects large shifts)
+        - **Rule 2:** Two out of three consecutive points outside the ±2σ limits. (Detects smaller shifts)
+        - **Rule 4:** Eight consecutive points on one side of the center line. (Detects sustained small shifts or bias)
+        """)
+
+with col2:
+    st.subheader("ML: Anomaly Detection")
+    st.info("ML models learn the normal operating *patterns* of a system, including across multiple variables. They flag deviations from this learned normal pattern.")
+    with st.expander("How it Works (Rolling Z-Score Example)"):
+        st.markdown("""
+        A simple ML approach is to calculate a Z-score based on a *rolling* window of recent data, not the entire history. This adapts to local process behavior.
+        """)
+        st.latex(r''' Z_{rolling} = \frac{x_i - \mu_{window}}{\sigma_{window}} ''')
+        st.markdown("More advanced methods like LSTMs or Autoencoders learn complex, multivariate, and temporal patterns.")
+
+
 chart_data = generate_control_chart_data(shift_point=shift_point, shift_magnitude=shift_magnitude)
-fig_control = plot_control_chart_comparison(chart_data)
+fig_control = plot_control_chart_pro(chart_data)
 st.plotly_chart(fig_control, use_container_width=True)
 
-st.info("**Try This:** Set the 'Magnitude of Shift' to a small value like `1.0`. Notice how the ML anomaly detector (purple star) might flag a deviation *before* any point crosses the red SPC limits (red 'x'). This demonstrates the power of ML for early warning.")
-
-st.error("""
-**The Multivariate Trap that ML Solves:**
-Imagine temperature and pressure are correlated. In a normal state, if temp goes up, pressure goes up.
-- A classical system has two separate control charts.
-- A failure mode causes temp to go up while pressure stays flat.
-- Neither chart might signal a violation, as both values could be within their individual limits.
-- An ML model trained on the *relationship* between variables would immediately flag this broken correlation as a major anomaly.
+st.success("""
+**Verdict & Hybrid Strategy:**
+- **The Best of Both:** This is the most critical phase for a hybrid approach.
+- **Monitor CTQs with SPC:** Keep classical control charts on your final, critical-to-quality (CTQ) outputs. They are simple, robust, and universally understood.
+- **Monitor Inputs (Xs) with ML:** Deploy a multivariate ML anomaly detection model on the *input* and *process* parameters. This model acts as an **early warning system**. It will detect deviations in the inputs *before* they cause a defect in the output, allowing you to move from reactive to proactive control.
 """)
-st.success("**Hybrid Strategy:** Keep classical control charts on your critical-to-quality outputs (the 'what'). Deploy multivariate ML anomaly detection models on the input and process parameters (the 'why') to get early warnings and diagnostic insights.")
