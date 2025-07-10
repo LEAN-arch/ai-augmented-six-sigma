@@ -1,18 +1,6 @@
 import streamlit as st
-import sys
-import os
 import numpy as np
-
-# --- Robust Pathing ---
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-# ----------------------
-
-from utils.data_generator import generate_doe_data
-from utils.plotting import plot_doe_cube
-from utils.plotting_pro import plot_bayesian_optimization_interactive
-
+from app_helpers import generate_doe_data, plot_doe_cube, plot_bayesian_optimization_interactive
 
 st.set_page_config(layout="wide", page_title="Improve Phase")
 
@@ -46,6 +34,7 @@ with tab2:
 
     # --- Interactive Bayesian Optimization Demo ---
     # Define a "hidden" true function the algorithm will try to optimize
+    @st.cache_data
     def true_function(x):
         return (np.sin(x * 0.8) * 15) + (np.cos(x * 2.5)) * 5 - (x/10)**3
 
@@ -59,7 +48,7 @@ with tab2:
         fig, next_point = plot_bayesian_optimization_interactive(true_function, x_range, st.session_state.sampled_points)
         st.session_state.sampled_points['x'].append(next_point)
         st.session_state.sampled_points['y'].append(true_function(next_point))
-    
+
     if st.sidebar.button("Reset Simulation"):
         st.session_state.sampled_points = {'x': [2.0, 15.0], 'y': [true_function(2.0), true_function(15.0)]}
 
