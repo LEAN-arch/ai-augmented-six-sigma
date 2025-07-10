@@ -1,6 +1,16 @@
 import streamlit as st
-from utils.plotting_pro import plot_voc_nlp_summary
+import sys
+import os
 import graphviz
+
+# --- Robust Pathing ---
+# This ensures that 'utils' can be imported from the 'pages' directory
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+# ----------------------
+
+from utils.plotting_pro import plot_voc_nlp_summary
 
 st.set_page_config(layout="wide", page_title="Define Phase")
 st.title("🌀 Define Phase: Establishing the Foundation")
