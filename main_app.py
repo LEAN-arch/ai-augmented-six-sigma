@@ -1,5 +1,17 @@
+# main_app.py
+
 import streamlit as st
-# Corrected import path
+import sys
+import os
+
+# --- Robust Pathing ---
+# Add the project root to the Python path
+# This ensures that 'utils' can be imported from anywhere in the app
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+# ----------------------
+
 from utils.config import get_custom_css
 
 st.set_page_config(
