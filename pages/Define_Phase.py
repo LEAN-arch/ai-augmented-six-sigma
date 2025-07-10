@@ -1,26 +1,13 @@
 import streamlit as st
-import sys
-import os
-import graphviz
-
-# --- Robust Pathing ---
-# This ensures that 'utils' can be imported from the 'pages' directory
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-# ----------------------
-
-from utils.plotting_pro import plot_voc_nlp_summary
+from app_helpers import plot_voc_nlp_summary # Local import
 
 st.set_page_config(layout="wide", page_title="Define Phase")
 st.title("🌀 Define Phase: Establishing the Foundation")
-
+# ... (rest of the file is identical) ...
 st.markdown("""
 **Objective:** To clearly articulate the problem, project goals, scope, and high-level process map. This phase ensures the team is aligned and focused on a well-defined business problem.
 """)
 st.markdown("---")
-
-# --- Tool Comparison ---
 st.header("1. Process Mapping: SIPOC vs. Data-Driven Graphs")
 col1, col2 = st.columns(2)
 with col1:
@@ -30,7 +17,6 @@ with col1:
     - **Strength:** Simplicity, team alignment, and clear boundary definition.
     - **Limitation:** Relies entirely on existing domain knowledge and may miss latent, data-driven relationships.
     """)
-
 with col2:
     st.subheader("ML Counterpart: Causal Discovery")
     st.info("""
@@ -38,7 +24,6 @@ with col2:
     - **Strength:** Objectively discovers potential causal links and complex interactions that human experts might overlook.
     - **Limitation:** Requires large, high-quality datasets and the output is a set of hypotheses that require validation.
     """)
-
 st.header("2. Voice of the Customer (VOC): Surveys vs. NLP")
 col1, col2 = st.columns(2)
 with col1:
@@ -48,7 +33,6 @@ with col1:
     - **Strength:** Provides deep, contextual insights.
     - **Limitation:** Slow, expensive, small sample size, and prone to researcher bias. Difficult to scale.
     """)
-
 with col2:
     st.subheader("ML Counterpart: Natural Language Processing (NLP)")
     st.info("""
@@ -58,7 +42,6 @@ with col2:
     """)
     fig = plot_voc_nlp_summary()
     st.plotly_chart(fig, use_container_width=True)
-
 st.success("""
 **Verdict & Hybrid Strategy:**
 -   Use **SIPOC** to create the initial project charter and align stakeholders.
