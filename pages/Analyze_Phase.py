@@ -1,19 +1,8 @@
 import streamlit as st
-import sys
-import os
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-
-# --- Robust Pathing ---
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-# ----------------------
-
-from utils.data_generator import generate_nonlinear_data
-from utils.plotting_pro import plot_regression_comparison_pro
-from utils.config import COLORS
+from app_helpers import generate_nonlinear_data, plot_regression_comparison_pro, COLORS
 
 st.set_page_config(layout="wide", page_title="Analyze Phase")
 st.title("📈 Analyze Phase: Discovering Root Causes")
@@ -53,7 +42,7 @@ with col2:
         SHAP is a game theory approach to explain the output of any machine learning model. It connects optimal credit allocation with local explanations using the classic Shapley values. For each prediction, SHAP assigns each feature an importance value representing its contribution to pushing the prediction away from the baseline average.
         """)
 
-    # Fake SHAP values for demonstration
+    # Use the model's built-in feature importance as a stand-in for a full SHAP plot
     shap_values = pd.DataFrame({
         'Feature': X.columns,
         'Importance': np.abs(model.feature_importances_ * 10) # Scale for viz
@@ -66,17 +55,17 @@ with col2:
         marker_color=COLORS['secondary']
     ))
     fig_shap.update_layout(
-        title_text="<b>ML Root Cause:</b> SHAP Feature Importance",
-        xaxis_title="mean(|SHAP value|) - Average impact on model output",
+        title_text="<b>ML Root Cause:</b> Feature Importance",
+        xaxis_title="Average impact on model output",
         plot_bgcolor='white', paper_bgcolor='white'
     )
     st.plotly_chart(fig_shap, use_container_width=True)
-    st.caption("The SHAP plot correctly identifies the two real features as most important, while the noise feature has minimal impact.")
+    st.caption("The feature importance plot correctly identifies the two real features as most important, while the noise feature has minimal impact.")
 
 
 st.success("""
 **Verdict & Hybrid Strategy:**
 1.  **Build Both Models:** Fit a simple Linear Regression for a baseline understanding and a powerful model like XGBoost or Random Forest for maximum predictive accuracy.
 2.  **Compare Performance:** If the ML model's R² is significantly higher, you know your process has important non-linearities.
-3.  **Use SHAP for Root Cause:** Run SHAP on the high-performing ML model. The features with the highest SHAP values are your data-driven "vital few" Xs. These are the most likely root causes to target in the Improve phase.
+3.  **Use Feature Importance/SHAP for Root Cause:** Run an explainer on the high-performing ML model. The features with the highest importance values are your data-driven "vital few" Xs. These are the most likely root causes to target in the Improve phase.
 """)
