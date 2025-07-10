@@ -1,4 +1,4 @@
-# config.py
+# utils/config.py
 
 # Color palette for consistent branding
 COLORS = {
