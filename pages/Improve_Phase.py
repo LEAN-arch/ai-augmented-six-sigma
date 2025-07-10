@@ -1,8 +1,18 @@
 import streamlit as st
+import sys
+import os
+import numpy as np
+
+# --- Robust Pathing ---
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+# ----------------------
+
 from utils.data_generator import generate_doe_data
 from utils.plotting import plot_doe_cube
 from utils.plotting_pro import plot_bayesian_optimization_interactive
-import numpy as np
+
 
 st.set_page_config(layout="wide", page_title="Improve Phase")
 
