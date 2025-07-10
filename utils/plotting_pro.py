@@ -10,8 +10,8 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 from scipy.stats import norm, gaussian_kde
 import graphviz
-from config import COLORS  # Import the centralized color configuration
-
+# Corrected import path
+from utils.config import COLORS
 # --- Define Phase ---
 def plot_voc_nlp_summary():
     """
