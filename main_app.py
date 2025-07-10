@@ -1,18 +1,5 @@
-# main_app.py
-
 import streamlit as st
-import sys
-import os
-
-# --- Robust Pathing ---
-# Add the project root to the Python path
-# This ensures that 'utils' can be imported from anywhere in the app
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-# ----------------------
-
-from utils.config import get_custom_css
+from app_helpers import get_custom_css # This now works because the file is in the same directory
 
 st.set_page_config(
     page_title="AI-Augmented Six Sigma | Pro",
@@ -21,7 +8,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Apply custom CSS for professional styling
 st.markdown(get_custom_css(), unsafe_allow_html=True)
 
 st.title("🚀 AI-Augmented Six Sigma")
