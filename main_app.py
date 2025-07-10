@@ -1,5 +1,6 @@
 import streamlit as st
-from config import get_custom_css
+# Corrected import path
+from utils.config import get_custom_css
 
 st.set_page_config(
     page_title="AI-Augmented Six Sigma | Pro",
