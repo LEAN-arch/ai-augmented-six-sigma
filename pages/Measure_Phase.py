@@ -1,26 +1,58 @@
 import streamlit as st
 from utils.data_generator import generate_process_data
-from utils.plotting import plot_capability_analysis
+from utils.plotting_pro import plot_capability_analysis_pro
 
 st.set_page_config(layout="wide", page_title="Measure Phase")
-st.title("🔬 Measure Phase: Quantifying Performance")
-st.markdown("In the Measure phase, we validate our measurement systems and establish a baseline. ML provides a more nuanced, distributional view of performance compared to single-point classical metrics.")
-
-st.header("Capability Analysis: Classical (Cp, Cpk) vs. ML (KDE)")
+st.title("🔬 Measure Phase: Quantifying Process Performance")
 st.markdown("""
-- **Classical Approach (Cp, Cpk):** Assumes data is normally distributed. Provides simple, powerful indices to compare process spread and centering against specification limits.
-- **ML Approach (Kernel Density Estimation - KDE):** Non-parametric method that estimates the probability distribution of the data without assuming a specific form. It reveals the true shape, including multi-modality or skewness.
+**Objective:** To validate the measurement system and establish a reliable baseline of the process's current performance. The mantra is "if you can't measure it, you can't improve it."
+""")
+st.markdown("---")
+
+st.header("Capability Analysis: Indices vs. Full Distributions")
+st.markdown("""
+Capability analysis assesses whether a process is capable of meeting customer specifications.
 """)
 
-st.sidebar.header("Interactive Simulation")
+st.sidebar.header("Capability Simulator")
+st.sidebar.markdown("Adjust the process parameters to see how they affect capability.")
 lsl = st.sidebar.slider("Lower Specification Limit (LSL)", 80.0, 95.0, 90.0, key="measure_lsl")
 usl = st.sidebar.slider("Upper Specification Limit (USL)", 105.0, 120.0, 110.0, key="measure_usl")
-process_mean = st.sidebar.slider("Process Mean", 95.0, 105.0, 101.0, key="measure_mean")
-process_std = st.sidebar.slider("Process Std Dev", 0.5, 5.0, 2.0, key="measure_std")
+process_mean = st.sidebar.slider("Process Mean (μ)", 95.0, 105.0, 101.5, key="measure_mean")
+process_std = st.sidebar.slider("Process Std Dev (σ)", 0.5, 5.0, 2.0, key="measure_std")
 
-data = generate_process_data(process_mean, process_std, 500, lsl, usl)
-fig = plot_capability_analysis(data, lsl, usl, "Process Capability: Classical Histogram vs. ML KDE")
-st.plotly_chart(fig, use_container_width=True)
+col1, col2 = st.columns([1, 2])
 
-st.info("**Try This:** Move the 'Process Mean' slider closer to a spec limit. Notice how Cpk drops significantly, while the KDE plot visually shows the 'tail' of the distribution crossing the limit. The KDE provides a richer visual understanding of the risk.")
-st.success("**Hybrid Strategy:** Report Cpk as the standard industry metric, but use the KDE plot internally to understand the *real* process behavior and diagnose non-normality issues.")
+with col1:
+    st.subheader("Classical: Cp & Cpk")
+    st.info("Single-point indices that summarize capability. They are powerful but assume normality.")
+    with st.expander("Show Mathematical Formulas"):
+        st.markdown("**Process Potential (Cp):** Measures how well the process spread fits within the specification limits, ignoring centering.")
+        st.latex(r''' C_p = \frac{USL - LSL}{6\sigma} ''')
+        st.markdown("**Process Capability (Cpk):** Adjusts Cp for process centering. It represents the *actual* capability.")
+        st.latex(r''' C_{pk} = \min\left(\frac{USL - \mu}{3\sigma}, \frac{\mu - LSL}{3\sigma}\right) ''')
+    
+    data = generate_process_data(process_mean, process_std, 1000, lsl, usl)
+    fig, cp, cpk = plot_capability_analysis_pro(data, lsl, usl)
+    
+    st.metric("Process Potential (Cp)", f"{cp:.2f}")
+    st.metric("Process Capability (Cpk)", f"{cpk:.2f}")
+
+    if cpk < 1.0:
+        st.error("Process is not capable.")
+    elif 1.0 <= cpk < 1.33:
+        st.warning("Process is marginal. Improvement needed.")
+    else:
+        st.success("Process is capable.")
+
+with col2:
+    st.subheader("ML: Distributional View")
+    st.info("Non-parametric methods like Kernel Density Estimation (KDE) visualize the *true* shape of the process distribution, revealing skewness or multiple modes that indices hide.")
+    st.plotly_chart(fig, use_container_width=True)
+
+
+st.success("""
+**Verdict & Hybrid Strategy:**
+- **Report Cpk:** It is the industry standard and required for most quality management systems.
+- **Use KDE for Diagnostics:** The KDE plot is your expert diagnostic tool. If the Cpk is low, the KDE plot tells you *why*—is the process off-center? Is the spread too wide? Is the data not normal? This guides your next steps in the Analyze phase.
+""")
