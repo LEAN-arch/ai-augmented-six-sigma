@@ -1,10 +1,19 @@
 import streamlit as st
-from utils.data_generator import generate_nonlinear_data
-from utils.plotting_pro import plot_regression_comparison_pro
+import sys
+import os
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-from config import COLORS
+
+# --- Robust Pathing ---
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+# ----------------------
+
+from utils.data_generator import generate_nonlinear_data
+from utils.plotting_pro import plot_regression_comparison_pro
+from utils.config import COLORS
 
 st.set_page_config(layout="wide", page_title="Analyze Phase")
 st.title("📈 Analyze Phase: Discovering Root Causes")
