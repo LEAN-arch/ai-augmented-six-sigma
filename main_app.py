@@ -1,6 +1,17 @@
+# main_app.py
 import streamlit as st
-from app_helpers import get_custom_css # This now works because the file is in the same directory
+from app_helpers import get_custom_css
+from app_pages import (
+    show_define_phase,
+    show_measure_phase,
+    show_analyze_phase,
+    show_improve_phase,
+    show_control_phase,
+    show_comparison_matrix,
+    show_hybrid_strategy
+)
 
+# --- Global Page Configuration ---
 st.set_page_config(
     page_title="AI-Augmented Six Sigma | Pro",
     page_icon="🚀",
@@ -8,39 +19,33 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Apply custom CSS
 st.markdown(get_custom_css(), unsafe_allow_html=True)
 
-st.title("🚀 AI-Augmented Six Sigma")
-st.subheader("A Professional Dashboard for Integrating Classical Statistics and Machine Learning")
 
-st.markdown("""
-Welcome to the definitive guide for integrating **Machine Learning (ML)** into the **Six Sigma DMAIC framework**. This interactive dashboard is designed for engineers, data scientists, and quality leaders who want to leverage the best of both worlds: the structured rigor of classical statistics and the predictive power of modern ML.
-""")
+# --- Page Navigation Dictionary ---
+# We map the display names to the functions that render the page
+PAGES = {
+    "🌀 Define Phase": show_define_phase,
+    "🔬 Measure Phase": show_measure_phase,
+    "📈 Analyze Phase": show_analyze_phase,
+    "⚙️ Improve Phase": show_improve_phase,
+    "📡 Control Phase": show_control_phase,
+    "⚔️ Comparison Matrix": show_comparison_matrix,
+    "🧠 Hybrid Strategy": show_hybrid_strategy
+}
 
-st.markdown("---")
+# --- Sidebar Navigation ---
+st.sidebar.title("Dashboard Navigation")
+selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
-col1, col2 = st.columns(2)
+# --- Page Rendering ---
+# Call the function corresponding to the user's selection
+page_function = PAGES[selection]
+page_function()
 
-with col1:
-    st.header("🎯 Our Mission")
-    st.write("""
-    To provide a clear, technically deep, and interactive resource that demystifies the synergy between Six Sigma and AI. We aim to empower professionals to:
-    - **Understand** the strengths and weaknesses of each approach.
-    - **Identify** the right tool for the right problem.
-    - **Implement** hybrid strategies for superior process control and optimization.
-    - **Justify** decisions with both statistical rigor and data-driven evidence.
-    """)
-
-with col2:
-    st.header("🧭 How to Use This Dashboard")
-    st.write("""
-    Navigate through the DMAIC phases using the sidebar on the left. Each page offers:
-    - **Phase Objectives:** A clear statement of goals for each stage.
-    - **Tool Deep Dives:** Side-by-side comparisons with mathematical foundations.
-    - **Interactive Simulators:** Hands-on visualizations to build intuition.
-    - **Expert Verdicts:** Actionable takeaways for practical application.
-    """)
-
-st.info("👈 **Select a page from the sidebar to begin your deep dive into a specific DMAIC phase.**")
-
-st.image("https://i.imgur.com/uGAtbMh.png", caption="The evolution from descriptive statistics to predictive and prescriptive AI-driven quality control.")
+# --- Sidebar Footer ---
+st.sidebar.markdown("---")
+st.sidebar.info(
+    "This is an interactive dashboard demonstrating the integration of Machine Learning into the Six Sigma DMAIC framework."
+)
